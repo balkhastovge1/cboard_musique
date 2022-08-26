@@ -1,23 +1,23 @@
-# # Copyright (c) 2020 Antoine Tran Tan
-# #
+# Copyright (c) 2020 Antoine Tran Tan
+#
 
-# # Ignore everything
-# *
+# Ignore everything
+*
 
-# # Except certain file extensions
-# !*.cpp
-# !*.c
-# !*.hpp
-# !*.h
-# !*.md
-# !*.png
-# !*.gif
-# !*.jpg
-# !CMakeLists.txt
-# !/mbed-os
+# Except certain file extensions
+!*.cpp
+!*.c
+!*.hpp
+!*.h
+!*.md
+!*.png
+!*.gif
+!*.jpg
+!CMakeLists.txt
+!/mbed-os
 
-# # ...even if they are in subdirectories
-# !*/
+# ...even if they are in subdirectories
+!*/
 
-# # ...but not in 'build' folder
-# /build
+# ...but not in 'build' folder
+/build
