@@ -1,0 +1,55 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Verify",
+            "type": "shell",
+            "isBackground": true,
+            "problemMatcher": [],
+            "linux": {
+                "command": "echo \"Executable Path : ${command:cmake.launchTargetPath}\"",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            },
+            "osx": {
+                "command": "echo \"Executable Path : ${command:cmake.launchTargetPath}\"",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            },
+            "windows": {
+                "command": "echo \"Executable Path : ${command:cmake.launchTargetPath}\"",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            }
+        },
+        {
+            "label": "Upload",
+            "type": "shell",
+            "isBackground": true,
+            "problemMatcher": [],
+            "linux": {
+                "command": "openocd -f st_nucleo_f4.cfg -c \"program {${command:cmake.launchTargetPath}} verify reset\" -c shutdown",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            },
+            "osx": {
+                "command": "openocd -f st_nucleo_f4.cfg -c \"program {${command:cmake.launchTargetPath}} verify reset\" -c shutdown",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            },
+            "windows": {
+                "command": "C:/OpenOCD/bin/openocd.exe -f st_nucleo_f4.cfg -c 'program {${command:cmake.launchTargetPath}} verify reset' -c shutdown",
+                "options": {
+                    "cwd": "${workspaceRoot}"
+                    }
+            }
+        }
+    ]
+}
