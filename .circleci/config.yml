@@ -1,0 +1,50 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: debian:bullseye
+    steps:
+      - checkout
+      - run:
+          name: Recherche des dépendances
+          command: >
+            apt-get update && apt-get -y install
+            gcc-arm-none-eabi 
+            openocd 
+            libboost-tools-dev 
+            cmake 
+            ninja-build
+            git
+            ca-certificates
+      - run:
+          name: Récupération du depôt mbed-os
+          command: >
+            rm -r mbed-os && git submodule sync && git submodule update --init
+      - run:
+          name: Génération du dossier de build et creation du projet cmake
+          command: >
+            mkdir build && cd build && cmake ../ 
+            -G Ninja -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_ASM_COMPILER="arm-none-eabi-gcc"
+            -DCMAKE_C_COMPILER="arm-none-eabi-gcc"
+            -DCMAKE_CXX_COMPILER="arm-none-eabi-g++"
+      - run:
+          name: Compilation du code c/c++
+          command: cd build && ninja
+      - run:
+          name: Inspection du code c/c++
+          command: >
+            mkdir inspect_dir &&
+            cp
+            `find ./src -path ./build -prune -o -name '*.c' -print`
+            `find ./include -path ./build -prune -o -name '*.h' -print`
+            `find ./src -path ./build -prune -o -name '*.cpp' -print`
+            `find ./include -path ./build -prune -o -name '*.hpp' -print`
+            inspect_dir/. &&
+            inspect inspect_dir
+            -copyright -crlf -end -link -path_name -tab -ascii -apple_macro
+            -assert_macro -deprecated_macro -minmax -unnamed
+            > inspect_report.html
+      - store_artifacts:
+          path: inspect_report.html
+          destination: artefact
