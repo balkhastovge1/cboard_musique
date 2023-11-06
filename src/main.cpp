@@ -171,7 +171,7 @@ void application_init(void)
     mp3_cmd_write(MP3_CLOCKF_ADDR, 0x2000);
 
     // MP3 set volume, maximum volume is 0x00 and total silence is 0xFE.
-    mp3_set_volume(0x2F, 0x2F);
+    mp3_set_volume(0x00, 0x00);
     ThisThread::sleep_for(1000ms);
 
     // log_info( &logger, " Application Task " );
