@@ -42,9 +42,11 @@
 // Using Arduino pin notation
 C12832 lcd(D11, D13, D12, D7, D10);
 
-SPI Myspi(PE_6, PE_5, PE_2);
+SPI Myspi_request(PE_6, PE_5, PE_2, PE_4, use_gpio_ssel);
+SPI Myspi_data(PE_6, PE_5, PE_2, PD_12, use_gpio_ssel);
 
-DigitalOut SS(PE_4, 1), dcs(PD_12, 1);
+//DigitalOut SS(PE_4, 1), 
+// DigitalOut dcs(PD_12, 1);
 
 DigitalIn dreq(PF_8);
 
@@ -59,17 +61,6 @@ void application_task(void);
 
 int main()
 {
-    // int j = 0;
-    // lcd.cls();
-    // lcd.locate(0, 3);
-    // lcd.printf("mbed application shield!");
-
-    // while (true)
-    // { // this is the third thread
-    //     lcd.locate(0, 15);
-    //     lcd.printf("Counting : %d", j++);
-    //     ThisThread::sleep_for(1000ms);
-    // }
 
     application_init();
 
@@ -92,10 +83,8 @@ void mp3_cmd_write(char address, short input)
     tmp[1] = address;
     tmp[2] = (char)((input >> 8) & 0xFF);
     tmp[3] = (char)(input & 0xFF);
-
-    SS = 0;
-    Myspi.write(tmp, 4, nullptr, 0);
-    SS = 1;
+   
+    Myspi_request.write(tmp, 4, nullptr, 0);
 
     // Poll DREQ pin and block until module is ready to receive another command
     while (!dreq)
@@ -111,9 +100,9 @@ short mp3_cmd_read(char address)
     tmp1[0] = MP3_READ_CMD;
     tmp1[1] = address;
 
-    SS = 0;
-    Myspi.write(tmp1, 2, tmp2, 2);
-    SS = 1;
+
+    Myspi_request.write(tmp1, 2, tmp2, 2);
+
 
     result = tmp2[0];
     result <<= 8;
@@ -133,9 +122,8 @@ char mp3_data_write(char input)
     {
         return MP3_ERROR;
     }
-    dcs = 0;
-    Myspi.write(input);
-    dcs = 1;
+    Myspi_data.write(input);
+
     return MP3_OK;
 }
 
@@ -145,9 +133,9 @@ char mp3_data_write_32(char *input32)
     {
         return MP3_ERROR;
     }
-    dcs = 0;
-    Myspi.write((char *)input32, 32, nullptr, 0);
-    dcs = 1;
+
+    Myspi_data.write((char *)input32, 32, nullptr, 0);
+
     return MP3_OK;
 }
 
@@ -159,10 +147,15 @@ void mp3_set_volume(char vol_left, char vol_right)
 void application_init(void)
 {
     // Click initialization.
-    SS = 0;
-    SS = 1;
-    Myspi.format(8, 0);
-    Myspi.frequency(1000000);
+    Myspi_request.select();
+    Myspi_request.deselect();
+    Myspi_request.format(8, 0);
+    Myspi_request.frequency(1000000);
+
+    Myspi_data.select();
+    Myspi_data.deselect();
+    Myspi_data.format(8, 0);
+    Myspi_data.frequency(1000000);
 
     // mp3_reset( &mp3 );
 
