@@ -4,26 +4,44 @@
 #include "mbed.h"
 #include "rtos.h"
 #include "C12832.h"
-
-#include <iostream>     // std::cout
-#include <fstream>      // std::ifstream
+#include "SDBlockDevice.h"
 
 // Using Arduino pin notation
 C12832 lcd(D11, D13, D12, D7, D10);
 
+SDBlockDevice sd(MBED_CONF_SD_SPI_MOSI, MBED_CONF_SD_SPI_MISO, MBED_CONF_SD_SPI_CLK, MBED_CONF_SD_SPI_CS);
+uint8_t block[512] = "Hello World!\n";
+
 int main()
 {
-    std::ifstream ifs("test.txt", std::ifstream::in);
+    // Call the SDBlockDevice instance initialisation method
+    if (0 != sd.init()) {
+        printf("Init failed \n");
+        return -1;
+    }
+    printf("sd size: %llu\n",         sd.size());
+    printf("sd read size: %llu\n",    sd.get_read_size());
+    printf("sd program size: %llu\n", sd.get_program_size());
+    printf("sd erase size: %llu\n",   sd.get_erase_size());
 
-    char c = ifs.get();
-
-    while (ifs.good())
-    {
-        std::cout << c;
-        c = ifs.get();
+    // Set the frequency
+    if (0 != sd.frequency(5000000)) {
+        printf("Error setting frequency \n");
     }
 
-    ifs.close();
+    if (0 != sd.erase(0, sd.get_erase_size())) {
+        printf("Error Erasing block \n");
+    }
 
-    return 0;
+    // Write data block to the device
+    if (0 == sd.program(block, 0, 512)) {
+        // Read the data block from the device
+        if (0 == sd.read(block, 0, 512)) {
+            // Print the contents of the block
+            printf("%s", block);
+        }
+    }
+
+    // Call the SDBlockDevice instance de-initialisation method
+    sd.deinit();
 }
