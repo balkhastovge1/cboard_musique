@@ -26,7 +26,7 @@ int main()
     sd.init();
     fs.mount(&sd);
 
-    std::ifstream myfile("/fs/ManWithAMission.mp3");
+    std::ifstream myfile("/fs/not.mp3", std::ios_base::binary);
 
     chain << myfile.rdbuf();
 
