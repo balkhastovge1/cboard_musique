@@ -2,3 +2,6 @@
 //
 
 #include "my_header.h"
+
+
+char my_buffer[32] ={};

@@ -5,6 +5,7 @@
 #include "rtos.h"
 #include "C12832.h"
 #include "string.h"
+#include "my_header.h"
 
 #include "SDBlockDevice.h"
 #include "FATFileSystem.h"
@@ -21,21 +22,21 @@ FATFileSystem fs("fs");
 int main()
 {
     std::string texte;
-    std::ostringstream chain;
+    int realsize = 1;
 
     sd.init();
     fs.mount(&sd);
-
-    std::ifstream myfile("/fs/not.mp3", std::ios_base::binary);
-
-    chain << myfile.rdbuf();
-
-    texte = chain.str();
-
+    std::ifstream myfile("/fs/music.mp3", std::ios_base::binary);
+    while (realsize > 0)
+    {
+        realsize = myfile.readsome(my_buffer, 32);
+    }
+    fs.unmount();
     sd.deinit();
 
     while (true)
     {
+
         ThisThread::sleep_for(500ms);
     }
 }
